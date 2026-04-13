@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CollegeBot — AI FAQ Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-mark">CB</div>
+      <div>
+        <div class="logo-name">CollegeBot</div>
+        <div class="logo-status"><span class="dot"></span> Online</div>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="chat">Chat</button>
+      <button class="tab" data-tab="admin">Admin Panel</button>
+    </nav>
+  </header>
+
+  <main class="tab-panel active" id="tab-chat">
+    <div class="chat-layout">
+
+      <aside class="sidebar">
+        <p class="sidebar-heading">Browse Topics</p>
+        <div class="topic-list">
+          <button class="topic-btn" data-topic="admissions">
+            <span class="topic-icon" style="background:#dbeafe;color:#1e40af">🎓</span>
+            Admissions
+          </button>
+          <button class="topic-btn" data-topic="hostel">
+            <span class="topic-icon" style="background:#dcfce7;color:#166534">🏠</span>
+            Hostel
+          </button>
+          <button class="topic-btn" data-topic="fees">
+            <span class="topic-icon" style="background:#fef9c3;color:#854d0e">💰</span>
+            Fees
+          </button>
+          <button class="topic-btn" data-topic="academics">
+            <span class="topic-icon" style="background:#ede9fe;color:#5b21b6">📚</span>
+            Academics
+          </button>
+          <button class="topic-btn" data-topic="events">
+            <span class="topic-icon" style="background:#fce7f3;color:#9d174d">🎉</span>
+            Events
+          </button>
+          <button class="topic-btn" data-topic="contacts">
+            <span class="topic-icon" style="background:#f1f5f9;color:#475569">📞</span>
+            Contacts
+          </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="sidebar-heading">Try Asking</p>
+        <div class="suggestions" id="suggestions">
+          <button class="suggestion-chip">What are hostel timings?</button>
+          <button class="suggestion-chip">How do I apply for admission?</button>
+          <button class="suggestion-chip">What is the fee structure?</button>
+          <button class="suggestion-chip">Library opening hours?</button>
+        </div>
+
+        <div class="sync-status" id="sync-status">
+          <span class="sync-dot"></span>
+          <span id="sync-text">Loading FAQ from Google Sheets…</span>
+        </div>
+      </aside>
+
+      <section class="chat-main">
+        <div class="messages" id="messages">
+          <div class="msg bot">
+            <div class="avatar">CB</div>
+            <div class="bubble">
+              Hi! I'm <strong>CollegeBot</strong> 👋<br>
+              Ask me anything about admissions, fees, hostel, academics, events, or contacts. I'll do my best to help!
+            </div>
+          </div>
+        </div>
+
+        <div class="typing-indicator hidden" id="typing">
+          <div class="avatar">CB</div>
+          <div class="bubble"><span class="dot-1"></span><span class="dot-2"></span><span class="dot-3"></span></div>
+        </div>
+
+        <div class="input-bar">
+          <input type="text" id="userInput" placeholder="Ask a question…" autocomplete="off"/>
+          <button class="send-btn" id="sendBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <main class="tab-panel" id="tab-admin">
+    <div class="admin-layout">
+
+      <div class="admin-topbar">
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-num" id="stat-total">—</div>
+            <div class="stat-lbl">FAQ Entries</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-topics">6</div>
+            <div class="stat-lbl">Topics</div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-num" id="stat-unanswered">0</div>
+            <div class="stat-lbl">Unanswered</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-provider" style="font-size:15px;text-transform:capitalize">—</div>
+            <div class="stat-lbl">AI Provider</div>
+          </div>
+        </div>
+        <div class="admin-actions">
+          <button class="action-btn" id="refreshBtn">↻ Sync Sheets</button>
+          <a class="action-btn primary" id="sheetsLink" href="#" target="_blank">Open Google Sheet ↗</a>
+        </div>
+      </div>
+
+      <div class="admin-body">
+        <div class="table-section">
+          <div class="section-title">Knowledge Base</div>
+          <div class="table-wrap">
+            <table id="faq-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Question</th>
+                  <th>Answer</th>
+                  <th>Topic</th>
+                </tr>
+              </thead>
+              <tbody id="faq-tbody">
+                <tr><td colspan="4" class="empty-row">Loading from Google Sheets…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="unanswered-section">
+          <div class="section-title">Unanswered Queries <span class="badge-red" id="unanswered-badge">0</span></div>
+          <div id="unanswered-list">
+            <p class="empty-msg">No unanswered queries yet!</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
