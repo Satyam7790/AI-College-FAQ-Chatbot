@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CampusBot — AI College Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Theme & noise overlay -->
+  <div class="noise-overlay"></div>
+  <div class="page-glow"></div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="10" fill="url(#logoGrad)"/>
+          <path d="M8 24L18 10L28 24" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 20H24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="18" cy="27" r="2" fill="white"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366f1"/>
+              <stop offset="1" stop-color="#0ea5e9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="header-brand">
+        <span class="brand-name">CampusBot</span>
+        <span class="brand-tag">AI · RAG · 50 FAQs</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="search-pill" id="globalSearch">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span>Search any question...</span>
+        <kbd>⌘K</kbd>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="status-badge">
+        <span class="live-dot"></span>
+        <span>Live</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <span class="theme-icon-sun">☀️</span>
+        <span class="theme-icon-moon">🌙</span>
+      </button>
+      <button class="header-btn" onclick="openLogs()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Logs <span class="log-badge" id="logCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Browse Topics</div>
+        <nav class="topic-nav" id="topicList">
+          <!-- filled by JS -->
+        </nav>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Quick Actions</div>
+        <button class="sidebar-action" onclick="newChat()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          New Conversation
+        </button>
+        <button class="sidebar-action" onclick="exportLogs()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Chat Log
+        </button>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-stats">
+        <div class="stat-row">
+          <span class="stat-label">Satisfaction</span>
+          <span class="stat-val" id="satisfactionStat">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Queries today</span>
+          <span class="stat-val" id="queryStat">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Answered</span>
+          <span class="stat-val green" id="answeredStat">0</span>
+        </div>
+      </div>
+
+      <!-- Topic Questions Panel -->
+      <div class="topic-questions-panel" id="topicQuestionsPanel">
+        <div class="tqp-header">
+          <span id="tqpTitle">Questions</span>
+          <button class="tqp-close" onclick="closeTopicPanel()">✕</button>
+        </div>
+        <div class="tqp-list" id="tqpList"></div>
+      </div>
+    </aside>
+
+    <!-- CHAT PANEL -->
+    <main class="chat-area">
+
+      <!-- Messages -->
+      <div class="messages-area" id="messagesArea">
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-hero">
+            <div class="hero-badge">AI-Powered · RAG Architecture</div>
+            <h1 class="hero-title">Hello! I'm <em>CampusBot</em> 👋</h1>
+            <p class="hero-subtitle">Your intelligent college assistant. Ask me anything about admissions, academics, campus life, or contacts — I answer from real data.</p>
+          </div>
+
+          <div class="topic-cards-grid" id="topicCardsGrid">
+            <!-- filled by JS -->
+          </div>
+
+          <div class="welcome-divider"><span>or ask directly</span></div>
+
+          <div class="quick-asks" id="quickAsks">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing indicator (hidden) -->
+      <div class="typing-row" id="typingRow" style="display:none">
+        <div class="typing-avatar">🎓</div>
+        <div class="typing-bubble">
+          <div class="typing-dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <span class="typing-label">CampusBot is thinking...</span>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-zone">
+        <div class="input-card" id="inputCard">
+          <textarea
+            id="chatInput"
+            class="chat-textarea"
+            placeholder="Ask me anything about your college..."
+            rows="1"
+            onkeydown="handleKeyDown(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <div class="input-actions">
+            <div class="input-hints">
+              <span class="hint-tag" onclick="insertHint('What are the hostel timings?')">🏠 Hostel</span>
+              <span class="hint-tag" onclick="insertHint('What are the admission requirements?')">📋 Admissions</span>
+              <span class="hint-tag" onclick="insertHint('When are the final exams?')">📅 Exams</span>
+            </div>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="input-footer">Powered by Claude/Gemini · RAG over 50 FAQ entries · Press Enter to send</p>
+      </div>
+    </main>
+
+    <!-- INFO PANEL (right) -->
+    <aside class="info-panel" id="infoPanel">
+      <div class="ip-header">Knowledge Base</div>
+      <div class="kb-stats">
+        <div class="kb-stat">
+          <div class="kb-num">50</div>
+          <div class="kb-lbl">Total FAQs</div>
+        </div>
+        <div class="kb-stat">
+          <div class="kb-num">5</div>
+          <div class="kb-lbl">Topics</div>
+        </div>
+      </div>
+
+      <div class="ip-section">
+        <div class="ip-label">Topic Coverage</div>
+        <div class="coverage-bars" id="coverageBars">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <div class="ip-section">
+        <div class="ip-label">Last Query</div>
+        <div class="last-query-box" id="lastQueryBox">No queries yet</div>
+      </div>
+
+      <div class="ip-section">
+        <div class="ip-label">How it works</div>
+        <div class="how-steps">
+          <div class="how-step"><div class="step-num">1</div><span>Retrieves matching FAQ entries</span></div>
+          <div class="how-step"><div class="step-num">2</div><span>Feeds context to AI model</span></div>
+          <div class="how-step"><div class="step-num">3</div><span>Generates natural answer</span></div>
+        </div>
+      </div>
+
+      <!-- API Key -->
+      <div class="api-section" id="apiSection">
+        <div class="ip-label">AI Model Key</div>
+        <div class="api-key-form">
+          <input type="password" id="apiKeyInput" class="api-key-input" placeholder="Paste Gemini API key..." />
+          <button class="api-key-btn" onclick="saveApiKey()">Activate</button>
+        </div>
+        <p class="api-note">Free key at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a></p>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- SEARCH OVERLAY -->
+  <div class="search-overlay" id="searchOverlay" onclick="closeSearchOutside(event)">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search FAQ topics, questions..." oninput="handleSearch(this.value)" />
+        <kbd class="esc-key" onclick="closeSearch()">ESC</kbd>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-empty">Start typing to search across all 50 FAQs...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGS MODAL -->
+  <div class="modal-overlay" id="logsModal" onclick="closeLogsOutside(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Query Logs
+        </div>
+        <div class="modal-actions">
+          <button class="modal-export-btn" onclick="exportLogs()">⬇ Export CSV</button>
+          <button class="modal-close-btn" onclick="closeLogs()">✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Query</th>
+              <th>Topic</th>
+              <th>Status</th>
+              <th>Feedback</th>
+            </tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+        </table>
+        <div class="log-empty" id="logEmpty">No queries yet. Start a conversation!</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
